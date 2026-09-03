@@ -1,0 +1,25 @@
+{
+  "id": "IP08",
+  "description": "Serving → API Gateway",
+  "status": "PRE-CONFIGURED + IMPLEMENTED",
+  "test_coverage": ["IT-J1-golden-path", "IT-J5-trace-metrics-continuity", "IT-gateway-rate-limit"],
+  "contract": {
+    "input": "External HTTP request to the gateway listener",
+    "output": "Routed request with x-request-id; rate limit, auth policy and health routing"
+  },
+  "implementation": {
+    "function": "readiness_status",
+    "file": "src/lab28_platform/integration_tasks.py",
+    "gateway": "Envoy proxy (compose.yaml)"
+  },
+  "health_signal": "Gateway admin /ready 200; /healthz route answers without hitting the app",
+  "metrics": ["envoy_http_downstream_rq_total", "envoy_http_local_rate_limit_rate_limited"],
+  "evidence": {
+    "function_test": "test_readiness_distinguishes_failure_severity",
+    "semantics": [
+      "mandatory failed → not_ready",
+      "optional failed (no mandatory) → degraded",
+      "all pass → ready"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "IP10",
+  "description": "All components → LangSmith tracing",
+  "status": "PRE-CONFIGURED",
+  "test_coverage": ["IT-J5-trace-metrics-continuity", "IT-trace-span-coverage"],
+  "contract": {
+    "input": "OTLP spans from gateway, API, Kafka, Airflow, Spark, Feast, Qdrant, vLLM",
+    "output": "One trace ID spanning every boundary, exported to a local backend and LangSmith"
+  },
+  "implementation": {
+    "collector": "OTEL collector (otel-collector container)",
+    "backend": "Jaeger at http://localhost:16686",
+    "optional": "LangSmith (requires LANGSMITH_API_KEY)"
+  },
+  "health_signal": "Collector pipeline healthy; trace queryable by ID in the local backend",
+  "metrics": ["otelcol_exporter_sent_spans", "otelcol_exporter_send_failed_spans"],
+  "required_spans": [
+    "lab28.gateway.request",
+    "lab28.api.ingest",
+    "lab28.kafka.produce",
+    "lab28.kafka.consume",
+    "lab28.airflow.dag",
+    "lab28.spark.delta_merge",
+    "lab28.api.ask",
+    "lab28.feast.get_online_features",
+    "lab28.qdrant.query",
+    "lab28.mlflow.resolve_release",
+    "lab28.vllm.chat_completion"
+  ],
+  "gate": "langsmith",
+  "gate_note": "Local OTLP backend provides offline evidence. LangSmith requires credential.",
+  "evidence": {
+    "status": "REQUIRES_DOCKER_STACK",
+    "url": "http://localhost:16686"
+  }
+}

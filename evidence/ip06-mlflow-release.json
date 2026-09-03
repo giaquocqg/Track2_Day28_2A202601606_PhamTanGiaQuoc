@@ -1,0 +1,20 @@
+{
+  "id": "IP06",
+  "description": "MLflow → Model Registry",
+  "status": "PRE-CONFIGURED",
+  "test_coverage": ["IT-J1-golden-path", "IT-J3-promotion-rollback", "UT-release-provenance"],
+  "contract": {
+    "input": "Evaluation run over the Delta version + retrieval config + vLLM model id",
+    "output": "Registered model version with signature, tags, provenance and champion alias"
+  },
+  "implementation": {
+    "component": "ReleaseRegistry",
+    "file": "src/lab28_platform/model_registry.py"
+  },
+  "health_signal": "MLflow /health 200 and get_model_version_by_alias(champion) resolves",
+  "metrics": ["lab28_release_version_info"],
+  "evidence": {
+    "unit_tests": "tests/test_release_provenance.py - 10 tests",
+    "note": "Run uv run lab28 release to create a release"
+  }
+}

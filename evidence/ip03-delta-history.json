@@ -1,0 +1,27 @@
+{
+  "id": "IP03",
+  "description": "Pipeline → Delta Lake / Lakehouse",
+  "status": "IMPLEMENTED",
+  "test_coverage": ["IT-J1-golden-path", "IT-J2-idempotent-replay", "UT-delta-merge-idempotency"],
+  "contract": {
+    "input": "Batch of contracts.IngestionEvent (deduplicated by idempotency_key)",
+    "output": "Delta MERGE into feedback/documents tables; new table version; _delta_log entry"
+  },
+  "implementation": {
+    "function": "dedupe_latest",
+    "file": "src/lab28_platform/integration_tasks.py",
+    "key_logic": "(occurred_at, event_id) comparison - newest wins"
+  },
+  "health_signal": "DeltaTable.history() readable and version monotonically increasing",
+  "metrics": ["lab28_delta_version", "lab28_delta_rows_written_total"],
+  "evidence": {
+    "function_test": "test_delta_source_is_replay_safe_and_newest_wins",
+    "assertions": [
+      "Exactly one event per idempotency_key",
+      "Highest (occurred_at, event_id) wins",
+      "Deterministic output order (sorted by key)",
+      "Handles empty input"
+    ],
+    "unit_tests": "tests/test_delta_merge_idempotency.py - 18 tests"
+  }
+}

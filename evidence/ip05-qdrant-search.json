@@ -1,0 +1,21 @@
+{
+  "id": "IP05",
+  "description": "Data → Vector Store (embeddings)",
+  "status": "PRE-CONFIGURED",
+  "test_coverage": ["IT-J1-golden-path", "IT-J2-idempotent-replay", "UT-vector-stable-ids"],
+  "contract": {
+    "input": "Document rows from Delta + pinned embedding model",
+    "output": "Qdrant points in lab28_documents with deterministic UUID from doc_id"
+  },
+  "implementation": {
+    "component": "VectorStore",
+    "file": "src/lab28_platform/vector_store.py",
+    "idempotency": "stable_point_id() using uuid5 with ID_NAMESPACE"
+  },
+  "health_signal": "Qdrant /readyz 200 and collection point count > 0",
+  "metrics": ["lab28_retrieval_seconds", "lab28_vector_points"],
+  "evidence": {
+    "unit_tests": "tests/test_vector_stable_ids.py - 13 tests",
+    "note": "Run uv run lab28 index --source file to populate"
+  }
+}

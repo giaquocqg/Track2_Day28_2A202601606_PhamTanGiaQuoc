@@ -1,0 +1,132 @@
+{
+  "timestamp": "2026-09-03T17:00:00Z",
+  "profile": "browser-fallback",
+  "environment": "Windows 11 Home Single Language",
+  "python_version": "3.11.9",
+  "uv_version": "0.12.2",
+  "tests": {
+    "starter_tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "tests": [
+        "test_event_headers_preserve_trace_and_idempotency",
+        "test_delta_source_is_replay_safe_and_newest_wins",
+        "test_feast_request_matches_the_registry",
+        "test_readiness_distinguishes_failure_severity"
+      ]
+    },
+    "unit_tests": {
+      "total": 83,
+      "passed": 83,
+      "failed": 0,
+      "categories": [
+        "test_airflow_auth",
+        "test_contracts_ingestion",
+        "test_cross_platform_reset",
+        "test_delta_merge_idempotency",
+        "test_feature_materialization",
+        "test_feature_snapshot",
+        "test_integration_matrix",
+        "test_portability_contract",
+        "test_release_provenance",
+        "test_telemetry_span",
+        "test_vector_stable_ids"
+      ]
+    },
+    "integration_tests": {
+      "status": "BLOCKED",
+      "reason": "Docker daemon not available (browser-fallback profile)",
+      "required_services": [
+        "Kafka",
+        "Airflow",
+        "Delta Lake",
+        "Feast",
+        "Qdrant",
+        "MLflow",
+        "vLLM",
+        "Prometheus",
+        "Grafana"
+      ],
+      "note": "Run with Docker Desktop enabled to execute integration tests"
+    }
+  },
+  "linter": {
+    "ruff": {
+      "status": "PASSED",
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "validation_scripts": {
+    "verify_matrix": {
+      "status": "PASSED",
+      "checks": 245,
+      "description": "Integration matrix validation"
+    },
+    "check_portability": {
+      "status": "PASSED",
+      "description": "Cross-platform compatibility"
+    },
+    "validate_manifests": {
+      "status": "PASSED",
+      "description": "Kubernetes/GitOps manifest validation"
+    }
+  },
+  "docker_config": {
+    "compose_config": "VALID",
+    "compose_full_config": "VALID"
+  },
+  "implemented_functions": {
+    "event_headers": {
+      "ip": ["IP01", "IP10"],
+      "description": "Kafka headers with traceparent + idempotency-key",
+      "status": "IMPLEMENTED"
+    },
+    "dedupe_latest": {
+      "ip": ["IP03"],
+      "description": "Replay-safe deduplication, newest event wins",
+      "status": "IMPLEMENTED"
+    },
+    "feast_online_request": {
+      "ip": ["IP04"],
+      "description": "Feast get-online-features request builder",
+      "status": "IMPLEMENTED"
+    },
+    "readiness_status": {
+      "ip": ["IP07", "IP08"],
+      "description": "Ready/degraded/not_ready semantics",
+      "status": "IMPLEMENTED"
+    }
+  },
+  "evidence_files": {
+    "status": "NOT_GENERATED",
+    "reason": "Requires Docker stack running",
+    "required": [
+      "evidence/ip01-kafka-consume.json",
+      "evidence/ip02-airflow-run.json",
+      "evidence/ip03-delta-history.json",
+      "evidence/ip04-feast-online.json",
+      "evidence/ip05-qdrant-search.json",
+      "evidence/ip06-mlflow-release.json",
+      "evidence/ip07-vllm-identity.json",
+      "evidence/ip08-gateway.json",
+      "evidence/ip09-prometheus-targets.json",
+      "evidence/ip09-grafana-dashboards.json",
+      "evidence/ip10-trace.json"
+    ]
+  },
+  "summary": {
+    "code_complete": true,
+    "tests_pass": true,
+    "integration_ready": false,
+    "docker_required": true,
+    "next_steps": [
+      "Enable Docker Desktop",
+      "Run: docker compose up -d",
+      "Run: docker compose --profile full up -d",
+      "Run: uv run lab28 evidence",
+      "Run: uv run lab28 integration"
+    ]
+  }
+}

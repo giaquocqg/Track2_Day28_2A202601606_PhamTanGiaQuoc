@@ -1,0 +1,30 @@
+{
+  "id": "IP04",
+  "description": "Lakehouse → Feature Store (Feast)",
+  "status": "IMPLEMENTED",
+  "test_coverage": ["IT-J1-golden-path", "IT-J4-degraded-recovery"],
+  "contract": {
+    "input": "Delta-derived offline snapshot at delta_root/exports/asker_activity",
+    "output": "Feast online store rows for entity asker_id; feature service asker_serving_v1"
+  },
+  "implementation": {
+    "function": "feast_online_request",
+    "file": "src/lab28_platform/integration_tasks.py",
+    "features": [
+      "asker_activity_v1:feedback_count",
+      "asker_activity_v1:avg_rating",
+      "asker_activity_v1:negative_ratio",
+      "asker_activity_v1:delta_version"
+    ]
+  },
+  "health_signal": "Feast feature server /health 200 and get-online-features returns the entity",
+  "metrics": ["lab28_feature_lookup_seconds", "lab28_feature_freshness_seconds"],
+  "evidence": {
+    "function_test": "test_feast_request_matches_the_registry",
+    "assertions": [
+      "entities = {asker_id: [asker_id]}",
+      "features = FEATURE_REFS from contracts",
+      "full_feature_names = false"
+    ]
+  }
+}

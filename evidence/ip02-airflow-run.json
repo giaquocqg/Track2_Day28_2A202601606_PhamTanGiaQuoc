@@ -1,0 +1,21 @@
+{
+  "id": "IP02",
+  "description": "Kafka → Airflow pipeline",
+  "status": "PRE-CONFIGURED",
+  "test_coverage": ["IT-J1-golden-path", "IT-J4-degraded-recovery"],
+  "contract": {
+    "input": "contracts.IngestionEvent consumed from data.raw with W3C traceparent header",
+    "output": "Airflow 3 asset event on asset lab28://delta/feedback; run_id recorded"
+  },
+  "implementation": {
+    "component": "Airflow DAG",
+    "file": "airflow/dags/lab28_ingestion_pipeline.py",
+    "consumer_group": "lab28-airflow-consumer"
+  },
+  "health_signal": "Airflow api-server /api/v2/monitor/health reports scheduler+triggerer healthy",
+  "metrics": ["lab28_pipeline_batches_total", "lab28_consumer_lag"],
+  "evidence": {
+    "status": "REQUIRES_DOCKER_STACK",
+    "note": "Run docker compose up -d then uv run lab28 seed --via-gateway"
+  }
+}

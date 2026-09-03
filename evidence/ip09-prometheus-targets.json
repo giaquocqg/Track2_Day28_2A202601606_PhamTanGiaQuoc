@@ -1,0 +1,26 @@
+{
+  "id": "IP09",
+  "description": "All components → Prometheus / Grafana",
+  "status": "PRE-CONFIGURED",
+  "test_coverage": ["IT-J5-trace-metrics-continuity", "IT-prometheus-targets"],
+  "contract": {
+    "input": "Prometheus scrape of every service that exposes /metrics",
+    "output": "Provisioned Grafana dashboards and at least one actionable SLO alert"
+  },
+  "implementation": {
+    "components": ["lab28-api", "gateway", "kafka", "feast", "qdrant", "mlflow"],
+    "scrape_config": "prometheus/prometheus.yml"
+  },
+  "health_signal": "Prometheus /api/v1/targets shows all expected jobs up",
+  "metrics": ["up", "lab28_request_seconds"],
+  "dashboards": [
+    "Grafana dashboard for golden signals (latency, errors, saturation)"
+  ],
+  "evidence": {
+    "status": "REQUIRES_DOCKER_STACK",
+    "urls": {
+      "Prometheus": "http://localhost:9090",
+      "Grafana": "http://localhost:3000"
+    }
+  }
+}

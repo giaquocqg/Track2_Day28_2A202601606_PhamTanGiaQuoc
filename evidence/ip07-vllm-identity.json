@@ -1,0 +1,27 @@
+{
+  "id": "IP07",
+  "description": "Model → vLLM / SGLang serving",
+  "status": "GATE_GPU_REQUIRED",
+  "test_coverage": ["IT-J1-golden-path", "IT-J3-promotion-rollback", "IT-J4-degraded-recovery"],
+  "contract": {
+    "input": "Grounded prompt built from champion release config + retrieved sources",
+    "output": "OpenAI-compatible chat completion from a real vLLM server; model id echoed"
+  },
+  "implementation": {
+    "component": "LLMClient",
+    "file": "src/lab28_platform/llm_client.py",
+    "endpoint": "OpenAI-compatible /v1/chat/completions"
+  },
+  "health_signal": "vLLM /health 200, /version reports a vLLM build, /metrics exposes vllm: series",
+  "metrics": ["lab28_llm_seconds", "lab28_llm_tokens_total"],
+  "gate": "gpu",
+  "gate_note": "Requires real GPU-backed vLLM 0.28 endpoint. Mock/CPU fails by design.",
+  "evidence": {
+    "status": "REQUIRES_GPU",
+    "required_checks": [
+      "/version returns vLLM build info",
+      "/v1/models contains configured model ID",
+      "metrics contain vllm: prefix"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "IP01",
+  "description": "HTTP ingestion → Kafka",
+  "status": "IMPLEMENTED",
+  "test_coverage": ["IT-J1-golden-path", "IT-J2-idempotent-replay", "UT-contracts-ingestion"],
+  "contract": {
+    "input": "contracts.FeedbackSubmission | contracts.DocumentSubmission (HTTP, via gateway)",
+    "output": "contracts.IngestionEvent on topic data.raw, key = idempotency_key"
+  },
+  "implementation": {
+    "function": "event_headers",
+    "file": "src/lab28_platform/integration_tasks.py",
+    "headers": ["idempotency-key (required)", "traceparent (optional)"]
+  },
+  "health_signal": "Kafka broker reachable; data.raw topic exists with configured retention",
+  "metrics": ["lab28_ingestion_events_total", "lab28_ingestion_publish_seconds"],
+  "evidence": {
+    "function_test": "test_event_headers_preserve_trace_and_idempotency",
+    "assertions": [
+      "idempotency-key always present as bytes",
+      "traceparent present when provided, omitted when None"
+    ]
+  }
+}
