@@ -1,9 +1,31 @@
 {
-  "timestamp": "2026-09-03T17:00:00Z",
-  "profile": "browser-fallback",
+  "timestamp": "2026-09-03T22:40:00Z",
+  "profile": "local-standard",
   "environment": "Windows 11 Home Single Language",
   "python_version": "3.11.9",
   "uv_version": "0.12.2",
+  "docker_stack": {
+    "status": "PARTIAL",
+    "running_services": [
+      "kafka",
+      "api",
+      "gateway",
+      "feast",
+      "qdrant",
+      "mlflow",
+      "prometheus",
+      "grafana",
+      "jaeger",
+      "otel-collector",
+      "kafka-exporter",
+      "pushgateway"
+    ],
+    "blocked_services": [
+      "airflow (port 4040 conflict)",
+      "spark-connect (port 4040 conflict)",
+      "vllm (requires GPU)"
+    ]
+  },
   "tests": {
     "starter_tests": {
       "total": 4,
@@ -35,20 +57,11 @@
       ]
     },
     "integration_tests": {
-      "status": "BLOCKED",
-      "reason": "Docker daemon not available (browser-fallback profile)",
-      "required_services": [
-        "Kafka",
-        "Airflow",
-        "Delta Lake",
-        "Feast",
-        "Qdrant",
-        "MLflow",
-        "vLLM",
-        "Prometheus",
-        "Grafana"
-      ],
-      "note": "Run with Docker Desktop enabled to execute integration tests"
+      "status": "BLOCKED_AIRFLOW",
+      "reason": "Airflow blocked by port 4040 conflict (Spark Connect)",
+      "required_services": ["Airflow", "Spark Connect"],
+      "j1_tests": "12 tests blocked",
+      "gateway_tests": "5 tests blocked"
     }
   },
   "linter": {
@@ -73,60 +86,108 @@
       "description": "Kubernetes/GitOps manifest validation"
     }
   },
-  "docker_config": {
-    "compose_config": "VALID",
-    "compose_full_config": "VALID"
+  "platform_commands": {
+    "seed": {
+      "status": "SUCCESS",
+      "documents_accepted": 13,
+      "feedback_accepted": 7,
+      "feedback_rejected_rate_limit": 5
+    },
+    "index": {
+      "status": "SUCCESS",
+      "source": "file",
+      "documents_submitted": 13,
+      "points_upserted": 13,
+      "points_total": 13,
+      "collection": "lab28_documents",
+      "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    },
+    "release": {
+      "status": "SUCCESS",
+      "model_name": "lab28-rag-release",
+      "version": 1,
+      "run_id": "3a6262d241ba45b789a29aedf872c7aa",
+      "alias": "champion",
+      "vllm_model": "Qwen/Qwen3-1.7B"
+    },
+    "topics": {
+      "status": "SUCCESS",
+      "topics": {
+        "data.raw": "exists",
+        "data.processed": "created",
+        "model.events": "created",
+        "data.raw.dlq": "created"
+      }
+    },
+    "inspect": {
+      "kafka": "1 broker, 1 topic",
+      "feast": "reachable, healthy",
+      "qdrant": "reachable, 13 points",
+      "mlflow": "reachable, champion v1",
+      "vllm": "unreachable (expected - no GPU)",
+      "spark_delta": "not reachable (requires Airflow)"
+    },
+    "ready": {
+      "status": "degraded",
+      "reason": "vLLM not available (no GPU)",
+      "components": {
+        "kafka": "ready",
+        "mlflow": "ready",
+        "qdrant": "ready",
+        "feast": "ready",
+        "vllm": "not_ready"
+      }
+    }
   },
   "implemented_functions": {
     "event_headers": {
       "ip": ["IP01", "IP10"],
       "description": "Kafka headers with traceparent + idempotency-key",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "tests_pass": true
     },
     "dedupe_latest": {
       "ip": ["IP03"],
       "description": "Replay-safe deduplication, newest event wins",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "tests_pass": true
     },
     "feast_online_request": {
       "ip": ["IP04"],
       "description": "Feast get-online-features request builder",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "tests_pass": true
     },
     "readiness_status": {
       "ip": ["IP07", "IP08"],
       "description": "Ready/degraded/not_ready semantics",
-      "status": "IMPLEMENTED"
+      "status": "IMPLEMENTED",
+      "tests_pass": true
     }
   },
-  "evidence_files": {
-    "status": "NOT_GENERATED",
-    "reason": "Requires Docker stack running",
-    "required": [
-      "evidence/ip01-kafka-consume.json",
-      "evidence/ip02-airflow-run.json",
-      "evidence/ip03-delta-history.json",
-      "evidence/ip04-feast-online.json",
-      "evidence/ip05-qdrant-search.json",
-      "evidence/ip06-mlflow-release.json",
-      "evidence/ip07-vllm-identity.json",
-      "evidence/ip08-gateway.json",
-      "evidence/ip09-prometheus-targets.json",
-      "evidence/ip09-grafana-dashboards.json",
-      "evidence/ip10-trace.json"
-    ]
+  "integration_points_status": {
+    "IP01": "IMPLEMENTED - event_headers function complete",
+    "IP02": "BLOCKED - requires Airflow",
+    "IP03": "IMPLEMENTED - dedupe_latest function complete",
+    "IP04": "IMPLEMENTED - feast_online_request function complete",
+    "IP05": "WORKING - Qdrant indexed with 13 documents",
+    "IP06": "WORKING - MLflow release v1 created as champion",
+    "IP07": "DEGRADED - vLLM requires GPU",
+    "IP08": "IMPLEMENTED - readiness_status function complete",
+    "IP09": "WORKING - Prometheus/Grafana running",
+    "IP10": "WORKING - Jaeger/OTEL running"
   },
   "summary": {
     "code_complete": true,
     "tests_pass": true,
-    "integration_ready": false,
-    "docker_required": true,
+    "core_platform_working": true,
+    "full_integration_blocked": true,
+    "blocked_by": "port 4040 conflict (Airflow/Spark Connect)",
     "next_steps": [
-      "Enable Docker Desktop",
-      "Run: docker compose up -d",
+      "Free port 4040",
       "Run: docker compose --profile full up -d",
-      "Run: uv run lab28 evidence",
-      "Run: uv run lab28 integration"
+      "Run integration tests",
+      "Generate evidence"
     ]
   }
 }

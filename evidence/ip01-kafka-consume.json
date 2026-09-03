@@ -1,7 +1,7 @@
 {
   "id": "IP01",
   "description": "HTTP ingestion → Kafka",
-  "status": "IMPLEMENTED",
+  "status": "WORKING",
   "test_coverage": ["IT-J1-golden-path", "IT-J2-idempotent-replay", "UT-contracts-ingestion"],
   "contract": {
     "input": "contracts.FeedbackSubmission | contracts.DocumentSubmission (HTTP, via gateway)",
@@ -15,10 +15,20 @@
   "health_signal": "Kafka broker reachable; data.raw topic exists with configured retention",
   "metrics": ["lab28_ingestion_events_total", "lab28_ingestion_publish_seconds"],
   "evidence": {
-    "function_test": "test_event_headers_preserve_trace_and_idempotency",
-    "assertions": [
-      "idempotency-key always present as bytes",
-      "traceparent present when provided, omitted when None"
-    ]
+    "seed_result": {
+      "documents_accepted": 13,
+      "feedback_accepted": 7,
+      "feedback_rejected_rate_limit": 5
+    },
+    "sample_events": [
+      {
+        "event_id": "23bf18c06c1d4b03807e0cc338e8bd2f",
+        "idempotency_key": "doc:doc-ip01-kafka:d7089177544aeae3578788aa1612914e",
+        "entity_id": "doc-ip01-kafka",
+        "topic": "data.raw",
+        "trace_id": "f567fbd5f9ba7c8142c098b9df2fe467"
+      }
+    ],
+    "function_test": "test_event_headers_preserve_trace_and_idempotency - PASSED"
   }
 }

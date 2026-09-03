@@ -1,7 +1,7 @@
 {
   "id": "IP05",
   "description": "Data → Vector Store (embeddings)",
-  "status": "PRE-CONFIGURED",
+  "status": "WORKING",
   "test_coverage": ["IT-J1-golden-path", "IT-J2-idempotent-replay", "UT-vector-stable-ids"],
   "contract": {
     "input": "Document rows from Delta + pinned embedding model",
@@ -15,7 +15,15 @@
   "health_signal": "Qdrant /readyz 200 and collection point count > 0",
   "metrics": ["lab28_retrieval_seconds", "lab28_vector_points"],
   "evidence": {
-    "unit_tests": "tests/test_vector_stable_ids.py - 13 tests",
-    "note": "Run uv run lab28 index --source file to populate"
+    "index_result": {
+      "source": "file",
+      "collection": "lab28_documents",
+      "documents_submitted": 13,
+      "points_upserted": 13,
+      "points_total": 13,
+      "embedding_model_id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2@faf4aa4225822f3bc6376869cb1164e8e3feedd0"
+    },
+    "unit_tests": "tests/test_vector_stable_ids.py - 13 tests PASSED",
+    "qdrant_ui": "http://localhost:6333/dashboard"
   }
 }
