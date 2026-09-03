@@ -1,31 +1,7 @@
 {
-  "id": "IP06",
-  "description": "MLflow → Model Registry",
-  "status": "WORKING",
-  "test_coverage": ["IT-J1-golden-path", "IT-J3-promotion-rollback", "UT-release-provenance"],
-  "contract": {
-    "input": "Evaluation run over the Delta version + retrieval config + vLLM model id",
-    "output": "Registered model version with signature, tags, provenance and champion alias"
-  },
-  "implementation": {
-    "component": "ReleaseRegistry",
-    "file": "src/lab28_platform/model_registry.py"
-  },
-  "health_signal": "MLflow /health 200 and get_model_version_by_alias(champion) resolves",
-  "metrics": ["lab28_release_version_info"],
-  "evidence": {
-    "release": {
-      "model_name": "lab28-rag-release",
-      "version": 1,
-      "run_id": "3a6262d241ba45b789a29aedf872c7aa",
-      "alias": "champion",
-      "prompt_version": "v1",
-      "vllm_model_id": "Qwen/Qwen3-1.7B",
-      "embedding_model_id": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2@faf4aa4225822f3bc6376869cb1164e8e3feedd0",
-      "top_k": 3,
-      "delta_version": null
-    },
-    "mlflow_ui": "http://localhost:5000",
-    "unit_tests": "tests/test_release_provenance.py - 10 tests PASSED"
-  }
+  "reachable": true,
+  "has_champion": true,
+  "version": "1",
+  "run_id": "3a6262d241ba45b789a29aedf872c7aa",
+  "detail": "lab28-rag-release v1 is champion"
 }
